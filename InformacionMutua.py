@@ -100,14 +100,14 @@ def informacionMutua(p1,p2):
     # En estas líneas calculo la probabilidad conjunta pij de que un dado nodo 
     # pertenezca a la comunidad i de la primera partición y a la comunidad j de
     # la segunda partición. Estas probabilidades están en la lista de listas 
-    # (o también podemos llamarle Matriz de confusión) prob_conj
+    # (o también podemos llamarle Matriz de coaparición normalizada), prob_conj.
     for pobi_list in comus1_list:
         pij = []
         for pobj_list in comus2_list:
             pij.append(len(intersect(pobi_list,pobj_list))/n)
         prob_conj.append(pij)
     
-    # En las líneas que queda, hago el cálculo de la información mutua, y 
+    # En las líneas que quedan, hago el cálculo de la información mutua, y 
     # entropías de Shannon (me encanta decirlo) para devolver la información
     # mutua normalizada.
     I = 0
