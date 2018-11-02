@@ -54,6 +54,10 @@ def poblacionComus(particion):
 
 # VER BIEN COMO FUNCIONA ESTA FUNCIÓN:
 def pares(listas):
+# IN: Una lista de listas de elementos.
+# OUT: Todos los pares posibles de elementos de las listas, formados de agarrar
+# un elemento de una lista y otro de otra lista diferente. Los devuelve como un
+# conjunto de conjuntos, donde cada uno de los subconjuntos es un par posible.
     pares_set = set()
     for t in combinations(listas, 2):
         for par in product(*t):
@@ -62,6 +66,12 @@ def pares(listas):
 
 
 def presicion(p1,p2): 
+# IN: Dos particiones de una misma red, en forma de diccionarios.
+# OUT: Indice de presición entre las dos particiones (me da una noción de 
+# acuerdo entre ellas).
+    
+    # En estas líneas me creo dos listas de listas, una de cada partición, en 
+    # donde en cada una tengo listas con los miembros de cada comunidad.
     comus1 = poblacionComus(p1)
     comus2 = poblacionComus(p2)
     comus1_list = []
@@ -82,15 +92,28 @@ def presicion(p1,p2):
                 miembros_comu.append(nodo)
         comus2_list.append(miembros_comu)
         
-        
+    # En estas líneas hago una lista de conjuntos, en donde cada conjunto  
+    # contiene todos los pares posibles de agarrar dos miembros de una misma 
+    # comunidad, para todas las comunidades de la partición 1. Luego, me fijo
+    # todos los pares posibles de miembros de cada comunidad de la partición 2
+    # y me fijo si estos pares también están en una misma comunidad en la
+    # partición 1. Si es así, significa que ese par está identificado en ambas
+    # particiones y esto contribuye a el nivel de acuerdo entre ellas. Esto le
+    # suma 1 punto a 'a11'.
+    # Por otro lado, calculo todos los pares de miembros que NO están en la 
+    # misma comunidad, para cada partición y veo si ellos tampoco forman parte
+    # de la misma comunidad en la otra partición. Esto también contribuye al 
+    # acuerdo entre las particiones y hace sumar 1 a 'a00'. Finalmente la 
+    # presición es la suma de estos dos números que me indican el acuerdo entre
+    # las dos particiones, dividido la cantidad de pares de nodos posibles de
+    # la red en su totalidad.
     pares_comus1 = []    
     for comu in comus1_list:
         pares1 = set()
         for par in combinations(comu,2):
             pares1.add(frozenset(par))
         pares_comus1.append(pares1)
-        
-        
+         
     a11 = 0
     a00 = 0
     for set_pares in pares_comus1:
@@ -107,6 +130,8 @@ def presicion(p1,p2):
             a00 += 1
     
     return (a11 + a00)/(n*(n-1)/2)
+# Para más información, el paper de Community detection in graphs - Fortunato:
+# https://arxiv.org/abs/0906.0612
 
 #------------------------------------------------------------------------------
 

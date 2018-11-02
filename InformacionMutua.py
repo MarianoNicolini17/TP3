@@ -59,7 +59,7 @@ def poblacionComus(particion):
 
 
 def informacionMutua(p1,p2):
-# IN: Dos particiones, en forma de diccionarios.
+# IN: Dos particiones de la misma red, en forma de diccionarios.
 # OUT: Información mutua normalizada.    
     
     # En estas líneas calculo las probabilidades, para cada partición, de que   
@@ -127,6 +127,8 @@ def informacionMutua(p1,p2):
         H2 += -probs_p2[i]*math.log(probs_p2[i],2)
         
     return 2*I/(H1 + H2)
+# Para más información, el paper de Community detection in graphs - Fortunato:
+# https://arxiv.org/abs/0906.0612
 
 #------------------------------------------------------------------------------
 
