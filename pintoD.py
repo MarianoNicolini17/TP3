@@ -63,9 +63,7 @@ for i in range(len(gen_delf)):
     a = gen_delf[i].rstrip('\n').split('\t')
     sex_delf.append(a)
     
-    
-    
-    
+
    
 def poblacionAtributoComus(red, particion):
 # IN: Una partición en forma de diccionario.
@@ -77,8 +75,6 @@ def poblacionAtributoComus(red, particion):
         c[comu]['f'] += red.nodes[nodo]['gender'] == 'f'
         c[comu]['NA'] += red.nodes[nodo]['gender'] == 'NA'
     return c
-
-
 
 
 def atributoNodos(r, alist, atributo):
