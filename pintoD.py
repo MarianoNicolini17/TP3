@@ -76,6 +76,15 @@ def poblacionAtributoComus(red, particion):
         c[comu]['NA'] += red.nodes[nodo]['gender'] == 'NA'
     return c
 
+def algo(red,particion, iters):
+    lista = []
+    for i in range(iters):
+        rr = generoAzar(red)
+        lista.append(np.array(poblacionAtributoComus(rr,particion)))
+    lista = np.array(lista)
+    np.swapaxes(lista,0,1)
+    
+    return lista
 
 def atributoNodos(r, alist, atributo):
 # Toma como argumentos una red, una lista de listas, donde cada una de ellas
