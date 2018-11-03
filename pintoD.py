@@ -1,13 +1,11 @@
 import numpy as np
 import networkx as nx
 import matplotlib.pylab as plt
-from urllib.request import urlopen
 from random import shuffle
 from copy import deepcopy
 import igraph
-from collections import Counter
-from itertools import combinations
-from itertools import product
+#from collections import Counter
+
 
 
 def clusterize(nx_Graph, method="infomap"):
@@ -48,44 +46,6 @@ def clusterize(nx_Graph, method="infomap"):
     return label_dict
 
 
-red_delf = nx.read_gml('./Datos/dolphins.gml')
-gen_delf = open('./Datos/dolphinsGender.txt').readlines()
-
-# Comunidades
-comus_infomap = clusterize(red_delf, "infomap")
-comus_louvain = clusterize(red_delf, "louvain")
-comus_edgeb = clusterize(red_delf, "edge_betweenness")
-comus_fg = clusterize(red_delf, "fastgreedy")
-
-    
-sex_delf = []   
-for i in range(len(gen_delf)):
-    a = gen_delf[i].rstrip('\n').split('\t')
-    sex_delf.append(a)
-    
-
-   
-def poblacionAtributoComus(red, particion):
-# IN: Una partición en forma de diccionario.
-# OUT: Un diccionario donde las keys son las comunidades y los values son el
-# número de miembros de cada comunidad.
-    c = [{'m': 0, 'f': 0, 'NA': 0} for i in set(particion.values())]
-    for nodo, comu in particion.items():
-        c[comu]['m'] += red.nodes[nodo]['gender'] == 'm'
-        c[comu]['f'] += red.nodes[nodo]['gender'] == 'f'
-        c[comu]['NA'] += red.nodes[nodo]['gender'] == 'NA'
-    return c
-
-def algo(red,particion, iters):
-    lista = []
-    for i in range(iters):
-        rr = generoAzar(red)
-        lista.append(np.array(poblacionAtributoComus(rr,particion)))
-    lista = np.array(lista)
-    np.swapaxes(lista,0,1)
-    
-    return lista
-
 def atributoNodos(r, alist, atributo):
 # Toma como argumentos una red, una lista de listas, donde cada una de ellas
 # indica el atributo que se le va a asignar a cada nodo de la red, y el 
@@ -94,7 +54,6 @@ def atributoNodos(r, alist, atributo):
     for idx, nodo in enumerate(np.array(alist).transpose()[0]):
         r.nodes[nodo][atributo] = np.array(alist).transpose()[1][idx]
     return
-atributoNodos(red_delf, sex_delf, 'gender')
 
 
 def generoAzar(r):
@@ -117,3 +76,98 @@ def generoAzar(r):
 def contadorGenero(r): #Generalizarlo para cualquier atributo
     a = list(nx.get_node_attributes(r, 'gender').values())
     return a.count('m'), a.count('f'), a.count('NA')
+
+#------------------------------------------------------------------------------
+
+def poblacionAtributoComus(red, particion):
+# IN: Una partición en forma de diccionario.
+# OUT: Un diccionario donde las keys son las comunidades y los values son el
+# número de miembros de cada comunidad.
+    c = [{'m': 0, 'f': 0, 'NA': 0} for i in set(particion.values())]
+    for nodo, comu in particion.items():
+        c[comu]['m'] += red.nodes[nodo]['gender'] == 'm'
+        c[comu]['f'] += red.nodes[nodo]['gender'] == 'f'
+        c[comu]['NA'] += red.nodes[nodo]['gender'] == 'NA'
+    return c
+
+def generoAzarComus(red, particion, iters):
+    lista = []
+    for i in range(iters):
+        rr = generoAzar(red)
+        lista.append(np.array(poblacionAtributoComus(rr,particion)))
+    #lista = np.swapaxes(np.array(lista),0,1)
+    return lista
+
+def datosGenComu(red, particion, iters):
+    dat0 = generoAzarComus(red, particion, iters)
+    dat = []
+    for comu in range(len(set(particion.values()))):
+        gencomu = []
+        for i in range(iters):
+            gencomu.append((dat0[i][comu]['m'], dat0[i][comu]['f']))
+        dat.append(gencomu)
+    return dat
+    
+def datosMachosComu(red, particion, iters):
+    dat0 = datosGenComu(red, particion, iters)
+    dat = []
+    for comu in range(len(set(particion.values()))):
+        mcomu = []
+        for i in range(iters):
+            mcomu.append(dat0[comu][i][0])
+        dat.append(mcomu)
+    return dat
+
+def datosHembrasComu(red, particion, iters):
+    dat0 = datosGenComu(red, particion, iters)
+    dat = []
+    for comu in range(len(set(particion.values()))):
+        mcomu = []
+        for i in range(iters):
+            mcomu.append(dat0[comu][i][1])
+        dat.append(mcomu)
+    return dat
+
+#------------------------------------------------------------------------------
+
+# Carga y tratamiento de datos.
+red_delf = nx.read_gml('./Datos/dolphins.gml')
+gen_delf = open('./Datos/dolphinsGender.txt').readlines()
+
+sex_delf = []   
+for i in range(len(gen_delf)):
+    a = gen_delf[i].rstrip('\n').split('\t')
+    sex_delf.append(a)
+    
+atributoNodos(red_delf, sex_delf, 'gender')
+
+
+# Comunidades
+comus_infomap = clusterize(red_delf, "infomap")
+comus_louvain = clusterize(red_delf, "louvain")
+comus_edgeb = clusterize(red_delf, "edge_betweenness")
+comus_fg = clusterize(red_delf, "fastgreedy")
+
+
+# Datos para los histogramas:
+machosAzar_louvain = datosMachosComu(red_delf, comus_louvain, 5000)
+machosAzar_infomap = datosMachosComu(red_delf, comus_infomap, 5000)
+machosAzar_edgeb = datosMachosComu(red_delf, comus_edgeb, 5000)
+machosAzar_fg = datosMachosComu(red_delf, comus_fg, 5000)
+
+hembrasAzar_louvain = datosHembrasComu(red_delf, comus_louvain, 5000)
+hembrasAzar_infomap = datosHembrasComu(red_delf, comus_infomap, 5000)
+hembrasAzar_edgeb = datosHembrasComu(red_delf, comus_edgeb, 5000)
+hembrasAzar_fg = datosHembrasComu(red_delf, comus_fg, 5000)
+
+# Confección de histogramas:
+x = machosAzar_louvain[4]
+plt.hist(x, bins=12, normed=True)
+#plt.title()
+plt.show()
+
+#histhomo, bin_edges = np.histogram(x, bins='scott', density=True)
+#bin_edges = (bin_edges[:-1] + bin_edges[1:])/2.
+#plt.plot(bin_edges, histhomo,'bo')
+#plt.title("Distribución nula")
+#plt.show()
