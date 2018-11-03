@@ -107,26 +107,28 @@ def datosGenComu(red, particion, iters):
             gencomu.append((dat0[i][comu]['m'], dat0[i][comu]['f']))
         dat.append(gencomu)
     return dat
-    
-def datosMachosComu(red, particion, iters):
+ 
+# -----------------------------------------------------------------------------
+
+# Con esta funcion se crean las listas de datos aleatorios que voy a necesitar
+# para hacer los histogramas, una lista de listas para los machos y una para 
+# las hembras. Dentro de la lista de machos (hembras) hay listas donde están 
+# los valores de machos (hembras) que se obtuvieron en las iteraciones, para 
+# una dada comunidad. 
+
+def listasGenComu(red, particion, iters):
     dat0 = datosGenComu(red, particion, iters)
-    dat = []
+    dat_machos = []
+    dat_hembras = []
     for comu in range(len(set(particion.values()))):
         mcomu = []
+        hcomu = []
         for i in range(iters):
             mcomu.append(dat0[comu][i][0])
-        dat.append(mcomu)
-    return dat
-
-def datosHembrasComu(red, particion, iters):
-    dat0 = datosGenComu(red, particion, iters)
-    dat = []
-    for comu in range(len(set(particion.values()))):
-        mcomu = []
-        for i in range(iters):
-            mcomu.append(dat0[comu][i][1])
-        dat.append(mcomu)
-    return dat
+            hcomu.append(dat0[comu][i][1])
+        dat_machos.append(mcomu)
+        dat_hembras.append(hcomu)
+    return dat_machos, dat_hembras
 
 #------------------------------------------------------------------------------
 
@@ -150,15 +152,15 @@ comus_fg = clusterize(red_delf, "fastgreedy")
 
 
 # Datos para los histogramas:
-machosAzar_louvain = datosMachosComu(red_delf, comus_louvain, 5000)
-machosAzar_infomap = datosMachosComu(red_delf, comus_infomap, 5000)
-machosAzar_edgeb = datosMachosComu(red_delf, comus_edgeb, 5000)
-machosAzar_fg = datosMachosComu(red_delf, comus_fg, 5000)
+machosAzar_louvain = listasGenComu(red_delf, comus_louvain, 5000)[0]
+machosAzar_infomap = listasGenComu(red_delf, comus_infomap, 5000)[0]
+machosAzar_edgeb = listasGenComu(red_delf, comus_edgeb, 5000)[0]
+machosAzar_fg = listasGenComu(red_delf, comus_fg, 5000)[0]
 
-hembrasAzar_louvain = datosHembrasComu(red_delf, comus_louvain, 5000)
-hembrasAzar_infomap = datosHembrasComu(red_delf, comus_infomap, 5000)
-hembrasAzar_edgeb = datosHembrasComu(red_delf, comus_edgeb, 5000)
-hembrasAzar_fg = datosHembrasComu(red_delf, comus_fg, 5000)
+hembrasAzar_louvain = listasGenComu(red_delf, comus_louvain, 5000)[1]
+hembrasAzar_infomap = listasGenComu(red_delf, comus_infomap, 5000)[1]
+hembrasAzar_edgeb = listasGenComu(red_delf, comus_edgeb, 5000)[1]
+hembrasAzar_fg = listasGenComu(red_delf, comus_fg, 5000)[1]
 
 # Confección de histogramas:
 x = machosAzar_louvain[4]
