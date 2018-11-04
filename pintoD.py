@@ -4,9 +4,9 @@ import matplotlib.pylab as plt
 from random import shuffle
 from copy import deepcopy
 import igraph
-#from collections import Counter
-
-
+from collections import Counter
+#from itertools import combinations
+import math
 
 def clusterize(nx_Graph, method="infomap"):
     """
@@ -74,10 +74,26 @@ def generoAzar(r):
 
 
 def contadorGenero(r): #Generalizarlo para cualquier atributo
+    gen_red = dict()
     a = list(nx.get_node_attributes(r, 'gender').values())
-    return a.count('m'), a.count('f'), a.count('NA')
+    gen_red['m'] = a.count('m')
+    gen_red['f'] = a.count('f')
+    gen_red['NA'] = a.count('NA')
+    return gen_red
+
+
+def combinatorio(n,r):
+    f = math.factorial
+    return f(n) / f(r) / f(n-r)
 
 #------------------------------------------------------------------------------
+
+def poblacionComus(particion):
+# IN: Una partición en forma de diccionario.
+# OUT: Un diccionario donde las keys son las comunidades y los values son el
+# número de miembros de cada comunidad.
+    values = particion.values()
+    return Counter(values)
 
 def poblacionAtributoComus(red, particion):
 # IN: Una partición en forma de diccionario.
@@ -89,6 +105,7 @@ def poblacionAtributoComus(red, particion):
         c[comu]['f'] += red.nodes[nodo]['gender'] == 'f'
         c[comu]['NA'] += red.nodes[nodo]['gender'] == 'NA'
     return c
+
 
 def generoAzarComus(red, particion, iters):
     lista = []
@@ -109,7 +126,8 @@ def datosGenComu(red, particion, iters):
     return dat
  
 # -----------------------------------------------------------------------------
-
+    
+# HISTOGRAMAS
 # Con esta funcion se crean las listas de datos aleatorios que voy a necesitar
 # para hacer los histogramas, una lista de listas para los machos y una para 
 # las hembras. Dentro de la lista de machos (hembras) hay listas donde están 
@@ -131,6 +149,24 @@ def listasGenComu(red, particion, iters):
     return dat_machos, dat_hembras
 
 #------------------------------------------------------------------------------
+
+# TEST DE FISHER
+
+def pFisherParticion(red, particion, atributo):
+    poblaciones = poblacionComus(particion)
+    distGenerosComus = poblacionAtributoComus(red, particion)
+    probas_comu = []
+    N = red.number_of_nodes()
+    r = contadorGenero(red)[atributo]
+    for comu in poblaciones.keys():
+        k = poblaciones[comu]
+        m = distGenerosComus[comu][atributo]
+        p = combinatorio(k, m)*combinatorio(N-k, r-m)/combinatorio(N, r)
+        probas_comu.append(p)
+    return probas_comu
+    
+
+
 
 # Carga y tratamiento de datos.
 red_delf = nx.read_gml('./Datos/dolphins.gml')
