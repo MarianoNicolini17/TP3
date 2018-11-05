@@ -131,7 +131,7 @@ def datosGenComu(red, particion, iters):
 # Con esta funcion se crean las listas de datos aleatorios que voy a necesitar
 # para hacer los histogramas, una lista de listas para los machos y una para 
 # las hembras. Dentro de la lista de machos (hembras) hay listas donde están 
-# los valores de machos (hembras) que se obtuvieron en las iteraciones, para 
+# los números de machos (hembras) que se obtuvieron en las iteraciones, para 
 # una dada comunidad. 
 
 def listasGenComu(red, particion, iters):
@@ -152,28 +152,37 @@ def listasGenComu(red, particion, iters):
 
 # TEST DE FISHER
 
-def pFisher(N, r, k, m):
+def hipergeometrica(N, r, k, m):
     p = combinatorio(k, m)*combinatorio(N-k, r-m)/combinatorio(N, r)
     return p
     
-
+# Esta función hace el test de Fisher para todas las comunidades de una dada 
+# partición. Hay que darle el atributo dicotómico para que haga el test según
+# esa variable. Por ej: Si el atributo es 'f', me va a decir, para cada 
+# comunidad, qué tanta probabilidad hay de obtener el número de hembras que 
+# tengo, o uno más grande, asumiendo que están distribuídos al azar (esto es el
+# p-value). Si esta probabilidad es muy chica, significa que debe existir una
+# correlación entre esa comunidad y la cantidad de machos que hay en ella y que
+# la hipótesis de que ese número viene del azar es poco probable de que sea 
+# verdadera.
 def testFisherParticion(red, particion, atributo):
     poblaciones = poblacionComus(particion)
     distGenerosComus = poblacionAtributoComus(red, particion)
     N = red.number_of_nodes()
-    r = contadorGenero(red)[atributo]
+    k = contadorGenero(red)[atributo]
     pval_comus = []
     for comu in poblaciones.keys():
         suma = 0
-        k = poblaciones[comu]
+        r = poblaciones[comu]
         m = distGenerosComus[comu][atributo]
-        for i in range(m, k):
-            suma += pFisher(N, r, k, i)
+        for i in range(m, r+1):
+            suma += hipergeometrica(N, r, k, i)
+            #print(suma)
+            print(N-k, r-i)
         pval_comus.append(suma)
     return pval_comus
-            
-        
-
+   
+#------------------------------------------------------------------------------         
 
 # Carga y tratamiento de datos.
 red_delf = nx.read_gml('./Datos/dolphins.gml')
