@@ -162,7 +162,7 @@ def hipergeometrica(N, r, k, m):
 # comunidad, qué tanta probabilidad hay de obtener el número de hembras que 
 # tengo, o uno más grande, asumiendo que están distribuídos al azar (esto es el
 # p-value). Si esta probabilidad es muy chica, significa que debe existir una
-# correlación entre esa comunidad y la cantidad de machos que hay en ella y que
+# correlación entre esa comunidad y la cantidad de hembras que hay en ella y que
 # la hipótesis de que ese número viene del azar es poco probable de que sea 
 # verdadera.
 def testFisherParticion(red, particion, atributo):
