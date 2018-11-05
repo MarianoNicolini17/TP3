@@ -152,20 +152,27 @@ def listasGenComu(red, particion, iters):
 
 # TEST DE FISHER
 
-def pFisherParticion(red, particion, atributo):
-    poblaciones = poblacionComus(particion)
-    distGenerosComus = poblacionAtributoComus(red, particion)
-    probas_comu = []
-    N = red.number_of_nodes()
-    r = contadorGenero(red)[atributo]
-    for comu in poblaciones.keys():
-        k = poblaciones[comu]
-        m = distGenerosComus[comu][atributo]
-        p = combinatorio(k, m)*combinatorio(N-k, r-m)/combinatorio(N, r)
-        probas_comu.append(p)
-    return probas_comu
+def pFisher(N, r, k, m):
+    p = combinatorio(k, m)*combinatorio(N-k, r-m)/combinatorio(N, r)
+    return p
     
 
+def testFisherParticion(red, particion, atributo):
+    poblaciones = poblacionComus(particion)
+    distGenerosComus = poblacionAtributoComus(red, particion)
+    N = red.number_of_nodes()
+    r = contadorGenero(red)[atributo]
+    pval_comus = []
+    for comu in poblaciones.keys():
+        suma = 0
+        k = poblaciones[comu]
+        m = distGenerosComus[comu][atributo]
+        for i in range(m, k):
+            suma += pFisher(N, r, k, i)
+        pval_comus.append(suma)
+    return pval_comus
+            
+        
 
 
 # Carga y tratamiento de datos.
