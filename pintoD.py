@@ -64,11 +64,11 @@ def generoAzar(r):
     n = list(r.nodes)
     shuffle(n)
     ra = deepcopy(r)
-    for i in range(ng[0]):
+    for i in range(ng['m']):
         ra.nodes[n[i]]['gender'] = 'm'
-    for i in range(ng[0], ng[0]+ng[1]):
+    for i in range(ng['f'], ng['m']+ng['f']):
          ra.nodes[n[i]]['gender'] = 'f'
-    for i in range(ng[0]+ng[1], ng[0]+ng[1]+ng[2]):
+    for i in range(ng['m']+ng['f'], ng['m']+ng['f']+ng['NA']):
          ra.nodes[n[i]]['gender'] = "NA"
     return ra
 
@@ -215,10 +215,15 @@ hembrasAzar_edgeb = listasGenComu(red_delf, comus_edgeb, 5000)[1]
 hembrasAzar_fg = listasGenComu(red_delf, comus_fg, 5000)[1]
 
 # Confección de histogramas:
-x = machosAzar_louvain[4]
-plt.hist(x, bins=12, normed=True)
+x = np.array(hembrasAzar_fg[4])/poblacionComus(comus_fg)[4]
+plt.hist(x, bins=3, normed=False)
 #plt.title()
 plt.show()
+
+bineo_infomap_machos = [12, 14, 9, 8, 6, 3]
+bineo_louvain_hembras = [8, 9, 15, 12, 13]
+bineo_edgeb_machos = [8, 12, 13, 11,3]
+bineo_fg_hembras = [13, 14, 15, 3]
 
 #histhomo, bin_edges = np.histogram(x, bins='scott', density=True)
 #bin_edges = (bin_edges[:-1] + bin_edges[1:])/2.
